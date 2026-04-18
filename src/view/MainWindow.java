@@ -48,9 +48,7 @@ public class MainWindow extends JFrame{
 
         createSouth();
         craeteEast();
-
-        // 🔥 criar fila
-
+        
         setVisible(true);
     }
 

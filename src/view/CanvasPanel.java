@@ -36,7 +36,7 @@ public class CanvasPanel extends JPanel{
 
         int i = 0;
 
-        List<ProcessModel> snapshot = new ArrayList<>();
+        List<ProcessModel> snapshot = new ArrayList<>(queue.getQueue());
 
         for(ProcessModel p: snapshot){
 
