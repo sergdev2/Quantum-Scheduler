@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JPanel;
 import model.ProcessModel;
 import model.ProcessQueue;
@@ -34,7 +36,9 @@ public class CanvasPanel extends JPanel{
 
         int i = 0;
 
-        for(ProcessModel p: queue.getQueue()){
+        List<ProcessModel> snapshot = new ArrayList<>();
+
+        for(ProcessModel p: snapshot){
 
             int y = i * 60 + 20;
 
