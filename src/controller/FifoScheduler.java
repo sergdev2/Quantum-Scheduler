@@ -1,6 +1,5 @@
 package controller;
 
-
 /*
 *  🔥 1. Criar um controller para o FIFO
 *  🔥 2. Criador Sergio Tiago
@@ -10,7 +9,7 @@ import model.ProcessQueue;
 import model.StateProcess;
 import view.CanvasPanel;
 
-public class FifoScheduler {
+public class FifoScheduler implements InterfaceScheduler {
 
     private ProcessQueue queue;
     private CanvasPanel canvas;
@@ -21,6 +20,7 @@ public class FifoScheduler {
         this.canvas = canvas;
     }
 
+    @Override
     private void executeStep() {
 
         if (queue.isEmptyProcess()) {

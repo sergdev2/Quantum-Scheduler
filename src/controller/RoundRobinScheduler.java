@@ -1,6 +1,5 @@
 package controller;
 
-import java.util.List;
 import javax.swing.SwingWorker;
 import model.ProcessModel;
 import model.ProcessQueue;
@@ -8,112 +7,41 @@ import model.StateProcess;
 import view.CanvasPanel;
 import view.MainWindow;
 
-public class RoundRobinScheduler {
+public class RoundRobinScheduler implements InterfaceScheduler {
 
     private SwingWorker<Void, Object> worker;
     private ProcessQueue queue;
-    private CanvasPanel canvas;
-    private MainWindow mainWindow;
-    private boolean running;
+    int quantum = 4;
 
-    public RoundRobinScheduler(ProcessQueue queue, CanvasPanel canvas, MainWindow mainWindow) {
+    public RoundRobinScheduler(ProcessQueue queue) {
         this.queue = queue;
-        this.canvas = canvas;
-        this.mainWindow = mainWindow;
     }
 
-    public void initSimulation() {
-
-        if (worker != null && !worker.isDone()) {
+    public void executeStep() {
+        // 🔥 Implementação do passo a passo do Round Robin
+        if (queue.isEmptyProcess()) {
+            return;
+        }
+        ProcessModel p = queue.nextProcess();
+        if (p == null) {
             return;
         }
 
-        running = true;
+        if (p.getState() == StateProcess.READY) {
+            p.setState(StateProcess.EXECUTING);
 
-        worker = new SwingWorker<>() {
-
-            @Override
-            protected Void doInBackground() throws Exception {
-
-                int quantum = 4;
-
-                try {
-                    while (running && !isCancelled()) {
-
-                        if (queue.isEmptyProcess()) {
-                            Thread.sleep(200);
-                            continue;
-                        }
-
-                        ProcessModel p = queue.nextProcess();
-
-                        if (p == null) {
-                            continue;
-                        }
-
-                        p.setState(StateProcess.EXECUTING);
-
-                        publish("▶ Process " + p.getName() + " started executing.");
-
-                        for (int i = 0; i < quantum; i++) {
-
-                            p.executorTick();
-
-                            publish(p); // 🔥 atualiza UI corretamente
-
-                            if (p.getState() == StateProcess.FINISHED) {
-                                publish("Process " + p.getName() + " finished.");
-                                break;
-                            }
-
-                            Thread.sleep(100);
-                        }
-
-                        if (p.getState() != StateProcess.FINISHED) {
-                            p.setState(StateProcess.READY);
-                            queue.addProcess(p);
-                        }
-                    }
-
-                } catch (InterruptedException e) {}
-
-                return null;
+            for (int i = 0; i < quantum; i++) {
+                if (p.getState() == StateProcess.FINISHED) {
+                    break;
+                }
+                p.executorTick();
             }
 
-            @Override
-            protected void process(List<Object> chunks) {
-
-                for (Object obj : chunks) {
-
-                    if (obj instanceof ProcessModel) {
-                        canvas.repaint();
-                    }
-
-                    if(obj instanceof String){
-                        mainWindow.log((String) obj);
-                    }
-                }   
+            if (p.getState() != StateProcess.FINISHED) {
+                p.setState(StateProcess.READY);
+                queue.addProcess(p);
             }
-        };
-
-        worker.execute(); // 🔥 ESSENCIAL
-    }
-
-    public void resetSimulation() {
-        pauseSimulation();
-        queue.getQueue().clear();
-        canvas.repaint();
-    }
-
-    public void pauseSimulation() {
-        running = false;
-
-        if (worker != null && !worker.isDone()) {
-            worker.cancel(true);
         }
     }
-
-    public void addProcess(ProcessModel process) {
-        queue.addProcess(process);
-    }
 }
+

@@ -1,8 +1,8 @@
 package controller;
 
-import model.*;
+import model.ProcessQueue;
 public interface InterfaceScheduler {
 
-    abstract void executeStep();
+    void executeStep(ProcessQueue queue);
 
 }
