@@ -1,8 +1,9 @@
 package controller;
 
-import model.ProcessQueue;
+import model.ProcessModel;
+
 public interface InterfaceScheduler {
 
-    void executeStep(ProcessQueue queue);
+    ProcessModel executeStep();
 
 }

@@ -47,6 +47,10 @@ public class ProcessQueue {
         return queue.size();
     }
 
+    public void clear(){
+        queue.clear();
+    }
+
     public ConcurrentLinkedQueue<ProcessModel> getQueue(){
         return queue;
     }

@@ -1,5 +1,7 @@
 package view;
 
+import controller.Controller;
+import controller.FifoScheduler;
 import controller.RoundRobinScheduler;
 import java.awt.*;
 import javax.swing.*;
@@ -19,10 +21,10 @@ public class MainWindow extends JFrame{
     private JComboBox<String> algorithmComboBox;
     private JSlider slider;
 
-    private RoundRobinScheduler controller;
+    private Controller controller;
     private ProcessQueue queue;
 
-    public void setController(RoundRobinScheduler controller) {
+    public void setController(Controller controller) {
         this.controller = controller;
     }
 
@@ -43,7 +45,6 @@ public class MainWindow extends JFrame{
         // 🔥 ligar fila ao canvas
         canvas.setQueue(queue);
         // 🔥 criar controller
-        controller = new RoundRobinScheduler(queue, canvas,this);
 
         // 🔥 TESTE: adicionar processos
         queue.addProcess(new ProcessModel("P1", 30));
@@ -51,7 +52,7 @@ public class MainWindow extends JFrame{
         queue.addProcess(new ProcessModel("P3", 10));   
 
         createSouth();
-        craeteEast();
+        createEast();
 
         setVisible(true);
     }
@@ -108,13 +109,31 @@ public class MainWindow extends JFrame{
     public void createSouth(){
         areaText = new JTextArea(20, 30);
         logScrollPane = new JScrollPane(areaText);
-        
+
         southPanel.setLayout(new BorderLayout());
+        southPanel.add(logScrollPane, BorderLayout.CENTER);
     }
 
-    private void craeteEast(){
+    private void createEast(){
         algorithmComboBox = new JComboBox<>(new String[]{"Round Robin", "FIFO"});
         slider = new JSlider(1,10,5);
+
+        algorithmComboBox.addActionListener(e -> {
+
+            String selected = (String) algorithmComboBox.getSelectedItem();
+            
+            if (selected.equals("Round Robin")) {
+                
+                controller.setScheduler(new RoundRobinScheduler(queue));
+                log("🔄 Algorithm changed to Round Robin.");
+
+            } else if (selected.equals("FIFO")) {
+
+                controller.setScheduler(new FifoScheduler(queue, canvas));
+                log("🔄 Algorithm changed to FIFO.");
+
+            }
+        });
 
         slider.setMajorTickSpacing(1);
         slider.setPaintTicks(true);
@@ -158,6 +177,10 @@ public class MainWindow extends JFrame{
         areaText.append(message + "\n");
     }
     public static void main(String[] args) {
-        new MainWindow();
+        SwingUtilities.invokeLater(() -> {
+            MainWindow window = new MainWindow();
+            Controller ctrl = new Controller(window.queue, window.canvas, window);
+            window.setController(ctrl);
+        });
     }
 }

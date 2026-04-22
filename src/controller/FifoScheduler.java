@@ -21,20 +21,24 @@ public class FifoScheduler implements InterfaceScheduler {
     }
 
     @Override
-    private void executeStep() {
+    public ProcessModel executeStep() {
 
         if (queue.isEmptyProcess()) {
-            return;
+            return null;
         }
 
-        ProcessModel p = queue.nextProcess();
+        // FIFO: peek sem remover — o processo atual executa até terminar
+        ProcessModel p = queue.peekNextProcess();
 
         p.setState(StateProcess.EXECUTING);
         p.executorTick();
         canvas.repaint();
 
+        // Só remove da fila quando o processo terminar (comportamento não-preemptivo)
         if (p.getState() == StateProcess.FINISHED) {
-            p.setState(StateProcess.FINISHED);
+            queue.nextProcess();
         }
+
+        return p;
     }
 }
