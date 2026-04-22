@@ -22,6 +22,10 @@ public class MainWindow extends JFrame{
     private RoundRobinScheduler controller;
     private ProcessQueue queue;
 
+    public void setController(RoundRobinScheduler controller) {
+        this.controller = controller;
+    }
+
     public MainWindow(){
         setTitle("Quantum Scheduler");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -39,7 +43,7 @@ public class MainWindow extends JFrame{
         // 🔥 ligar fila ao canvas
         canvas.setQueue(queue);
         // 🔥 criar controller
-        controller = new RoundRobinScheduler(queue, canvas);
+        controller = new RoundRobinScheduler(queue, canvas,this);
 
         // 🔥 TESTE: adicionar processos
         queue.addProcess(new ProcessModel("P1", 30));
@@ -48,7 +52,7 @@ public class MainWindow extends JFrame{
 
         createSouth();
         craeteEast();
-        
+
         setVisible(true);
     }
 
@@ -74,19 +78,19 @@ public class MainWindow extends JFrame{
     private  void createNorth(){
         // Button start
         startButton = new JButton("START");
-        startButton.addActionListener(e ->controller.start());
+        startButton.addActionListener(e ->controller.initSimulation());
 
         // Button pause
         pauseButton = new JButton("PAUSE");
-        pauseButton.addActionListener(e ->controller.stop());
+        pauseButton.addActionListener(e ->controller.pauseSimulation());
 
         // Button reset
         resetButton = new JButton("RESET");
-        resetButton.addActionListener(e ->{});
+        resetButton.addActionListener(e ->controller.resetSimulation());
 
         // Add button
         addButton = new JButton("ADD");
-        addButton.addActionListener(e ->{});
+        addButton.addActionListener(e ->controller.addProcess(new ProcessModel("P" + (queue.getQueue().size() + 1), slider.getValue() * 10)));
 
         // Add buttons is their panels
         northPanel.add(startButton);
@@ -102,11 +106,10 @@ public class MainWindow extends JFrame{
     }
 
     public void createSouth(){
-        areaText = new JTextArea();
+        areaText = new JTextArea(20, 30);
         logScrollPane = new JScrollPane(areaText);
         
         southPanel.setLayout(new BorderLayout());
-        southPanel.add(logScrollPane, BorderLayout.CENTER);
     }
 
     private void craeteEast(){
